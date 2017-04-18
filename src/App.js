@@ -1,8 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import { zipObject, drop, take, concat, fill } from 'lodash'
 
 import Table from './Table'
 import './App.css'
+
+/* globals fetch */
 
 const infoSymbol = Symbol('info')
 
@@ -12,10 +14,10 @@ class App extends Component {
     values: null,
     lookup: null,
     recommended: {
-      "кКал (Кк)": 1400,
-      "Белки (г)": 79,
-      "Жиры (г)": 63,
-      "Угл (г)": 132
+      'кКал (Кк)': 1400,
+      'Белки (г)': 79,
+      'Жиры (г)': 63,
+      'Угл (г)': 132
     }
   }
   componentDidMount () {
@@ -46,9 +48,6 @@ class App extends Component {
     return values.filter(val => val.length === validLength)
   }
   resetValues (values) {
-    const head = values[0]
-    const validLength = head.length
-
     return values.map((val, ix) => {
       const isHeader = ix === 0
       if (!isHeader) {
@@ -64,14 +63,14 @@ class App extends Component {
       const row = values[i]
       const name = row[0]
       const quantity = row[1]
-      const info = drop(row, 2).map(it => it/quantity)
+      const info = drop(row, 2).map(it => it / quantity)
       body[name] = zipObject(head, info)
       body[name][infoSymbol] = info
     }
     return body
   }
   renderNoData () {
-    return <div className="App">
+    return <div className='App'>
       Calculate it.
     </div>
   }

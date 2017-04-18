@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import { drop, take, round, isFunction } from 'lodash'
 import './Table.css'
 
@@ -51,7 +51,7 @@ class Table extends Component {
     const hasInputCallback = isFunction(onInput)
 
     return <td key={ix}>
-      <div suppressContentEditableWarning={true} contentEditable={!isLabel && hasInputCallback} onInput={onInput}>
+      <div suppressContentEditableWarning contentEditable={!isLabel && hasInputCallback} onInput={onInput}>
         {isLabel ? cell : round(cell, 3)}
       </div>
     </td>
@@ -77,7 +77,7 @@ class Table extends Component {
     const foot = this.renderRows(footValues, headValues[0])
     const rows = this.renderRows(drop(values), headValues[0], onValueChange)
 
-    return <table className="nutrient-calculator-table">
+    return <table className='nutrient-calculator-table'>
       <thead>{head}</thead>
       <tfoot>{foot}</tfoot>
       <tbody>{rows}</tbody>
