@@ -1,3 +1,7 @@
+:root {
+  --table-border-color: #cecece;
+}
+
 .nutrient-calculator-table {
   margin: 10px;
   border-collapse: collapse;
@@ -6,6 +10,7 @@
 .nutrient-calculator-table th:first-child,
 .nutrient-calculator-table td:first-child {
   font-style: italic;
+  border-right: 1px solid var(--table-border-color);
 }
 .nutrient-calculator-table th:first-child div,
 .nutrient-calculator-table td:first-child div {
@@ -14,7 +19,7 @@
 
 .nutrient-calculator-table tbody td:nth-child(3) {
   background: #daecff;
-  border-left: 1px solid #cecece;
+  border-left: 1px solid var(--table-border-color);
 }
 .nutrient-calculator-table tbody td:nth-child(4) {
   background: #ffffe4;
@@ -24,12 +29,17 @@
 }
 .nutrient-calculator-table tbody td:nth-child(6) {
   background: #fff;
-  border-right: 1px solid #cecece;
+  border-right: 1px solid var(--table-border-color);
+}
+
+.nutrient-calculator-table th {
+  border-bottom: 1px solid var(--table-border-color);
 }
 
 .nutrient-calculator-table th,
 .nutrient-calculator-table td {
   padding: 10px 15px;
+  text-align: center;
 }
 
 .nutrient-calculator-table th div,
@@ -45,8 +55,8 @@
   background: #00ffbe;
 }
 .nutrient-calculator-table tfoot td:nth-child(3) {
-  border-left: 1px solid #cecece;
+  border-left: 1px solid var(--table-border-color);
 }
 .nutrient-calculator-table tfoot td:nth-child(6) {
-  border-right: 1px solid #cecece;
+  border-right: 1px solid var(--table-border-color);
 }
