@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import { zipObject, drop, take, concat, fill } from 'lodash'
+import { zipObject, drop, take, concat, fill, cloneDeep, each } from 'lodash'
+import { pull, push, commit } from './sessionStorage'
 
-import Table from './Table'
+import Fable from './Fable'
 import './App.css'
 
 /* globals fetch */
@@ -17,7 +18,12 @@ class App extends Component {
       'кКал (Кк)': 1400,
       'Белки (г)': 79,
       'Жиры (г)': 63,
-      'Угл (г)': 132
+      'Угл (г)': 132,
+      'Вит А (мкг)': 900,
+      'Вит С (мг)': 90,
+      'Кальций (мг)': 1000,
+      'Омега 3 (мг)': 3,
+      'Цинк (мг)': 10
     }
   }
   componentDidMount () {
@@ -32,10 +38,19 @@ class App extends Component {
       .then(response => response.json())
       .then(data => {
         const values = this.filterValidValues(data.values)
+        const lookup = this.groupByProductNameAndNormalize(values)
+        const { values: storedValues } = pull()
+        let displayValues = this.resetValues(values)
+        if (storedValues) {
+          displayValues = this.reStoreValues(displayValues, storedValues)
+        }
+        return { values: displayValues, lookup }
+      })
+      .then(({values, lookup}) => {
         this.setState({
           fetchedAt: +new Date(),
-          lookup: this.groupByProductNameAndNormalize(values),
-          values: this.resetValues(values)
+          lookup,
+          values
         })
       })
       .catch(err => {
@@ -48,13 +63,20 @@ class App extends Component {
     return values.filter(val => val.length === validLength)
   }
   resetValues (values) {
-    return values.map((val, ix) => {
+    return cloneDeep(values).map((val, ix) => {
       const isHeader = ix === 0
       if (!isHeader) {
         fill(val, 0, 1)
       }
       return val
     })
+  }
+  reStoreValues (target, values) {
+    const newTarget = cloneDeep(target)
+    each(values, (data) => {
+      newTarget[data.rowIx] = data.row
+    })
+    return newTarget
   }
   groupByProductNameAndNormalize (values) {
     const head = drop(values[0], 2)
@@ -70,7 +92,7 @@ class App extends Component {
     return body
   }
   renderNoData () {
-    return <div className='App'>
+    return <div className='app__no-data'>
       Calculate it.
     </div>
   }
@@ -99,6 +121,11 @@ class App extends Component {
       this.changeNutrient(coord, value)
     }
 
+    push({values: {[`${coord.product}`]: {
+      rowIx: coord.row,
+      row: this.state.values[coord.row]}}
+    })
+    commit()
     console.log('changed value at:', coord, value)
   }
   onFootChange (coord, e) {
@@ -108,7 +135,7 @@ class App extends Component {
   render () {
     return (
       this.state.fetchedAt
-        ? <Table
+        ? <Fable
           values={this.state.values}
           recommended={this.state.recommended}
           onValueChange={this.onValueChange}
