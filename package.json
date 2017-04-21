@@ -8,12 +8,14 @@
     "react-dom": "^15.5.4"
   },
   "devDependencies": {
+    "flow-bin": "^0.44.2",
     "react-scripts": "0.9.5"
   },
   "scripts": {
     "start": "env $(cat DEV.env) react-scripts start",
     "build": "env $(cat PROD.env) react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "flow": "flow"
   }
 }

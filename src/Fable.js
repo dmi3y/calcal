@@ -1,18 +1,24 @@
+// @flow
+/* globals React$Element */
 import React, { Component } from 'react'
-import { drop, take, round, isFunction } from 'lodash'
+import { drop, take, round, isFunction, isNumber } from 'lodash'
 import './Fable.css'
 
+import EditableCell from './EditableCell'
+
 class Fable extends Component {
-  getFootValues (values, norm) {
+  getFootValues (values: Array<any>, norm: Array<any>): Array<any> {
     const defaultValues = take(values[0], values[0].length).fill(0)
 
-    const totals = values.reduce((acc, rowValue) => acc.map((it, ix) => {
-      return it + (Number(rowValue[ix]) || 0)
+    const totals = drop(values).reduce((acc, rowValues) => acc.map((it, ix) => {
+      const isAllowed = rowValues[ix] !== -1
+      const nextValue = isAllowed ? it + Number(rowValues[ix]) : it
+      return nextValue
     }), defaultValues)
 
-    totals[0] = 'Всего'
+    totals[0] = 'Сейчас'
 
-    norm[0] = 'Норма'
+    norm[0] = 'Я'
 
     return [
       totals,
@@ -20,15 +26,28 @@ class Fable extends Component {
     ]
   }
 
-  renderRowsShell (cellMaker, data, head, onChange) {
-    const rows = data.map((row, x) =>
-      <div className='nutrient-calculator-fable__row' key={x}>
+  getHeadValues (headData: Array<any>, recommended: Array<any>): Array<any> {
+    return headData.map(val => {
+      if (recommended.hasOwnProperty(val)) {
+        return <span>{recommended[val]} <span style={{
+          fontWeight: 600,
+          fontStyle: 'italic'
+        }}>{val}</span></span>
+      } else {
+        return val
+      }
+    })
+  }
+
+  renderRowsShell (cellMaker: Function, data: Array<any>, head: Array<any> = [], onChange: ?Function) {
+    const rows = data.map((row, ix) =>
+      <div className='nutrient-calculator-fable__row' key={ix}>
         {
           row.map((cell, y) => cellMaker(cell, y, onChange && onChange.bind(null, {
-            col: y,
-            row: x + 1,
-            product: row[0],
-            nutrient: head[y]
+            x: ix + 1,
+            labelX: row[0],
+            y: y,
+            labelY: head[y]
           })))
         }
       </div>
@@ -36,46 +55,74 @@ class Fable extends Component {
     return rows
   }
 
-  headCell (cell, ix) {
+  headCell (cell: React$Element<any>, ix: number) {
     return <div className='nutrient-calculator-fable__cell' key={ix}>
       {cell}
     </div>
   }
 
-  renderHead (data) {
-    return this.renderRowsShell(this.headCell, data)
+  renderHead (data: Array<any>) {
+    return this.renderRowsShell(this.headCell, [data])
   }
 
-  rowCell (cell, ix, onInput) {
-    const isLabel = ix === 0
+  rowCell (cell: React$Element<any>, ix: number, onInput: Function): React$Element<any> {
+    const isLabel = !isNumber(cell)
+    const isDisallowed = cell === -1
     const hasInputCallback = isFunction(onInput)
+    const isEditable = !isDisallowed && !isLabel && hasInputCallback
 
-    return <div className='nutrient-calculator-fable__cell' key={ix}>
-      <div suppressContentEditableWarning contentEditable={!isLabel && hasInputCallback} onInput={onInput}>
-        {isLabel ? cell : round(cell, 3)}
+    if (isEditable) {
+      const roundValue = round(cell, 3)
+      const showValue = roundValue > 0 ? roundValue : ''
+      return <div className='nutrient-calculator-fable__cell' key={ix}>
+        <EditableCell value={showValue} onInput={onInput} />
       </div>
+    }
+    if (isDisallowed) {
+      return <div className='nutrient-calculator-fable__cell' key={ix}>
+        -
+      </div>
+    }
+    if (isLabel) {
+      return <div className='nutrient-calculator-fable__cell' key={ix}>
+        {cell}
+      </div>
+    }
+    return <div className='nutrient-calculator-fable__cell' key={ix}>
+      {round(cell, 3)}
     </div>
   }
 
-  renderRows (data, head, onChange) {
+  renderRows (data: Array<any>, head: Array<any>, onChange: ?Function) {
     return this.renderRowsShell(this.rowCell, data, head, onChange)
   }
 
-  mapRecommended (recommendedMap, headValues) {
-    return headValues.map(val => recommendedMap[val] || 0)
+  mapRecommended (recommended: Array<any>, headValues: Array<any>) {
+    return headValues.map(val => {
+      const recommendedVal = recommended[val] || 0
+      if (recommendedVal) {
+        return <span>{recommendedVal} <span style={{
+          fontWeight: 600,
+          fontStyle: 'italic'
+        }}>{val}</span></span>
+      } else {
+        return 0
+      }
+    })
   }
 
-  render () {
-    const values = this.props.values
-    const headValues = take(values)
-    const recommended = this.mapRecommended(this.props.recommended, headValues[0])
-    const footValues = this.getFootValues(values, recommended)
+  render (): React$Element<any> {
+    const { values, recommended } = this.props
+    const headData = take(values)[0]
+    const norm = this.mapRecommended(recommended, headData)
+    const footValues = this.getFootValues(values, norm)
+    const headValues = this.getHeadValues(headData, recommended)
     const onValueChange = this.props.onValueChange
     // const onFootChange = this.props.onFootChange
 
     const head = this.renderHead(headValues)
-    const foot = this.renderRows(footValues, headValues[0])
-    const rows = this.renderRows(drop(values), headValues[0], onValueChange)
+    const foot = this.renderRows(footValues, headData)
+    const rows = this.renderRows(drop(values), headData, onValueChange)
 
     return <div className='nutrient-calculator-fable'>
       <div className='nutrient-calculator-fable__head'>{head}</div>
