@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { zipObject, drop, take, concat, cloneDeep, each } from 'lodash'
-import { pull, push } from './sessionStorage'
+import { pull, push } from './geestore'
 
 import Fable from './Fable'
 import './App.css'
