@@ -1,5 +1,16 @@
 import React, { Component } from 'react'
-import { zipObject, drop, take, concat, cloneDeep, each } from 'lodash'
+import {
+  zipObject,
+  drop,
+  take,
+  concat,
+  cloneDeep,
+  each,
+  isFinite,
+  isString,
+  isPlainObject,
+  isNumber
+} from 'lodash'
 import { pull, push } from './geestore'
 
 import Fable from './Fable'
@@ -79,7 +90,7 @@ class App extends Component {
   }
   restoreValues (storedValues) {
     each(storedValues, (data) => {
-      this.changeValue(data)
+      this.changeValue(data, false)
     })
   }
   groupByProductNameAndNormalize (values) {
@@ -100,7 +111,8 @@ class App extends Component {
       Calculate it.
     </div>
   }
-  changeQuantity ({x: row, labelX: product}, value) {
+  changeQuantity ({ coord, value }) {
+    const { x: row, labelX: product } = coord
     const normalizedInfo = this.state.lookup[product][infoSymbol]
     const values = this.state.values
     const copyRow = take(values[row])
@@ -110,30 +122,54 @@ class App extends Component {
       values
     })
   }
-  changeNutrient (coord, value) {
+  changeNutrient ({ coord, value }) {
     const {labelX: product, labelY: nutrient} = coord
     const normalizedNutrientValue = this.state.lookup[product][nutrient]
     const productValue = value / normalizedNutrientValue
-    this.changeQuantity(coord, productValue)
+    this.changeQuantity({coord, value: productValue})
   }
-  changeValue ({coord, value}) {
-    const isQuantity = coord.y === 1
-
-    if (isQuantity) {
-      this.changeQuantity(coord, value)
-    } else {
-      this.changeNutrient(coord, value)
+  validateValue ({coord, value}) {
+    let isValid = false
+    const hasValue = isFinite(value) || isString(value)
+    const hasCoord = isPlainObject(coord)
+    if (hasValue && hasCoord) {
+      const hasXCoord = isNumber(coord.x)
+      const hasXLabel = isString(coord.labelX)
+      const hasX = hasXLabel && hasXCoord
+      const hasYCoord = isNumber(coord.y)
+      const hasYLabel = isString(coord.labelY)
+      const hasY = hasYLabel && hasYCoord
+      isValid = hasX && hasY
     }
+    return isValid
+  }
+  changeValue (valuePack, isForPush = true) {
+    const isValidValue = this.validateValue(valuePack)
 
-    push({
-      values: {
-        [`${coord.labelX}`]: {
-          coord,
-          value
-        }
+    if (isValidValue) {
+      const { coord, value } = valuePack
+      const isQuantity = coord.y === 1
+
+      if (isQuantity) {
+        this.changeQuantity(valuePack)
+      } else {
+        this.changeNutrient(valuePack)
       }
-    })
-    console.log('changed value at:', coord, value)
+
+      if (isForPush) {
+        push({
+          values: {
+            [`${coord.labelX}`]: {
+              coord,
+              value
+            }
+          }
+        })
+      }
+      console.log('changed value at:', coord, value)
+    } else {
+      console.warn('got invalid value', valuePack)
+    }
   }
   onValueChange = (coord, e) => {
     const {labelX: product, labelY: nutrient, y} = coord

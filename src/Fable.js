@@ -65,17 +65,17 @@ class Fable extends Component {
     return this.renderRowsShell(this.headCell, [data])
   }
 
-  rowCell (cell: React$Element<any>, ix: number, onInput: Function): React$Element<any> {
+  rowCell (cell: React$Element<any>, ix: number, onChange: Function): React$Element<any> {
     const isLabel = !isNumber(cell)
     const isDisallowed = cell === -1
-    const hasInputCallback = isFunction(onInput)
+    const hasInputCallback = isFunction(onChange)
     const isEditable = !isDisallowed && !isLabel && hasInputCallback
 
     if (isEditable) {
       const roundValue = round(cell, 3)
       const showValue = roundValue > 0 ? roundValue : ''
       return <div className='nutrient-calculator-fable__cell' key={ix}>
-        <EditableCell value={showValue} onInput={onInput} />
+        <EditableCell value={showValue} onChange={onChange} />
       </div>
     }
     if (isDisallowed) {
