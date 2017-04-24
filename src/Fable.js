@@ -1,133 +1,80 @@
 // @flow
 /* globals React$Element */
 import React, { Component } from 'react'
-import { drop, take, round, isFunction, isNumber } from 'lodash'
+import { round, isFunction, isNumber } from 'lodash'
 import './Fable.css'
 
 import EditableCell from './EditableCell'
 
+type cell = {coord: {}, value: string | number}
+
 class Fable extends Component {
-  getFootValues (values: Array<any>, norm: Array<any>): Array<any> {
-    const defaultValues = take(values[0], values[0].length).fill(0)
-
-    const totals = drop(values).reduce((acc, rowValues) => acc.map((it, ix) => {
-      const isAllowed = rowValues[ix] !== -1
-      const nextValue = isAllowed ? it + Number(rowValues[ix]) : it
-      return nextValue
-    }), defaultValues)
-
-    totals[0] = 'Сейчас'
-
-    norm[0] = 'Я'
-
-    return [
-      totals,
-      norm
-    ]
-  }
-
-  getHeadValues (headData: Array<any>, recommended: Array<any>): Array<any> {
-    return headData.map(val => {
-      if (recommended.hasOwnProperty(val)) {
-        return <span>{recommended[val]} <span style={{
-          fontWeight: 600,
-          fontStyle: 'italic'
-        }}>{val}</span></span>
-      } else {
-        return val
+  renderHead (row: Array<*>) {
+    const rows = <div className='fable__row'>
+      {
+        row.map((cells) =>
+          cells.map((cell, ix) =>
+            <div className='fable__cell' key={ix}>
+              {cell.value}
+            </div>
+          )
+        )
       }
-    })
+    </div>
+    return rows
   }
 
-  renderRowsShell (cellMaker: Function, data: Array<any>, head: Array<any> = [], onChange: ?Function) {
+  rowCell (cell: cell, key: number, onChange: ?Function): React$Element<*> {
+    const isLabel = !isNumber(cell.value)
+    const isDisallowed = cell.value === -1
+    const hasInputCallback = isFunction(onChange)
+    const isEditable = !isDisallowed && !isLabel && hasInputCallback
+
+    if (onChange && isEditable) {
+      const roundValue = round(cell.value, 3)
+      const showValue = roundValue > 0 ? roundValue : ''
+      return <div className='fable__cell' key={key}>
+        <EditableCell value={showValue} onChange={onChange.bind(null, cell.coord)} />
+      </div>
+    }
+    if (isDisallowed) {
+      return <div className='fable__cell' key={key}>
+        -
+      </div>
+    }
+    if (isLabel) {
+      return <div className='fable__cell' key={key}>
+        {cell.value}
+      </div>
+    }
+    return <div className='fable__cell' key={key}>
+      {round(cell.value, 3)}
+    </div>
+  }
+
+  renderDash (data: Array<*>) {
+    return this.renderRows(data)
+  }
+
+  renderRows (data: Array<*>, onChange: ?Function) {
     const rows = data.map((row, ix) =>
-      <div className='nutrient-calculator-fable__row' key={ix}>
+      <div className='fable__row' key={ix}>
         {
-          row.map((cell, y) => cellMaker(cell, y, onChange && onChange.bind(null, {
-            x: ix + 1,
-            labelX: row[0],
-            y: y,
-            labelY: head[y]
-          })))
+          row.map((cell, y) => this.rowCell(cell, y, onChange))
         }
       </div>
     )
     return rows
   }
 
-  headCell (cell: React$Element<any>, ix: number) {
-    return <div className='nutrient-calculator-fable__cell' key={ix}>
-      {cell}
-    </div>
-  }
+  render (): React$Element<*> {
+    const { values, dashboard, onValueChange, className } = this.props
+    const dash = this.renderDash(dashboard)
+    const rows = this.renderRows(values, onValueChange)
 
-  renderHead (data: Array<any>) {
-    return this.renderRowsShell(this.headCell, [data])
-  }
-
-  rowCell (cell: React$Element<any>, ix: number, onChange: Function): React$Element<any> {
-    const isLabel = !isNumber(cell)
-    const isDisallowed = cell === -1
-    const hasInputCallback = isFunction(onChange)
-    const isEditable = !isDisallowed && !isLabel && hasInputCallback
-
-    if (isEditable) {
-      const roundValue = round(cell, 3)
-      const showValue = roundValue > 0 ? roundValue : ''
-      return <div className='nutrient-calculator-fable__cell' key={ix}>
-        <EditableCell value={showValue} onChange={onChange} />
-      </div>
-    }
-    if (isDisallowed) {
-      return <div className='nutrient-calculator-fable__cell' key={ix}>
-        -
-      </div>
-    }
-    if (isLabel) {
-      return <div className='nutrient-calculator-fable__cell' key={ix}>
-        {cell}
-      </div>
-    }
-    return <div className='nutrient-calculator-fable__cell' key={ix}>
-      {round(cell, 3)}
-    </div>
-  }
-
-  renderRows (data: Array<any>, head: Array<any>, onChange: ?Function) {
-    return this.renderRowsShell(this.rowCell, data, head, onChange)
-  }
-
-  mapRecommended (recommended: Array<any>, headValues: Array<any>) {
-    return headValues.map(val => {
-      const recommendedVal = recommended[val] || 0
-      if (recommendedVal) {
-        return <span>{recommendedVal} <span style={{
-          fontWeight: 600,
-          fontStyle: 'italic'
-        }}>{val}</span></span>
-      } else {
-        return 0
-      }
-    })
-  }
-
-  render (): React$Element<any> {
-    const { values, recommended } = this.props
-    const headData = take(values)[0]
-    const norm = this.mapRecommended(recommended, headData)
-    const footValues = this.getFootValues(values, norm)
-    const headValues = this.getHeadValues(headData, recommended)
-    const onValueChange = this.props.onValueChange
-    // const onFootChange = this.props.onFootChange
-
-    const head = this.renderHead(headValues)
-    const foot = this.renderRows(footValues, headData)
-    const rows = this.renderRows(drop(values), headData, onValueChange)
-
-    return <div className='nutrient-calculator-fable'>
-      <div className='nutrient-calculator-fable__head'>{head}</div>
-      <div className='nutrient-calculator-fable__body'>{rows}</div>
-      <div className='nutrient-calculator-fable__foot'>{foot}</div>
+    return <div className={`fable ${className}`}>
+      <div className='fable__dashboard'>{dash}</div>
+      <div className='fable__body'>{rows}</div>
     </div>
   }
 }

@@ -1,55 +1,48 @@
-.nutrient-calculator-fable {
-  --fable-border-color: #cecece;
-  --fable-head-color: #a2b2fd;
-  --fable-head-height: 100px;
-  --fable-foot-color: #2df373;
-  --fable-foot-height: 100px;
+.fable {
+  --border-color: #cecece;
+  --head-color: #a2b2fd;
+  --head-height: 100px;
+  --foot-color: #2df373;
+  --foot-height: 100px;
+  --cell-width: var(--fable-cell-width, 80px);
+  --cell-height: var(--fable-cell-height, inherit);
+  --dashboard-position: 0;
+
+  width: var(--fable-width, 100%);
+  position: relative;
 }
 
-.nutrient-calculator-fable__body {
-  padding: var(--fable-head-height) 10px var(--fable-foot-height);
+.fable__body .fable__row:nth-child(even) .fable__cell {
+  background: #f9f9f9;
+}
+.fable__dashboard {
+  position: relative;
+  top: var(--dashboard-position);
+  left: 0; right: 0;
+}
+.fable__dashboard .fable__cell {
+  background: var(--foot-color);
 }
 
-.nutrient-calculator-fable__body .nutrient-calculator-fable__cell {
-  border-left: 1px solid var(--fable-border-color);
+.fable__body,
+.fable__dashboard {
+  display: flex;
+  flex-direction: column;
 }
 
-.nutrient-calculator-fable__body .nutrient-calculator-fable__row:nth-child(even) {
-  background: #fbfbfb;
-}
-
-.nutrient-calculator-fable__head {
-  padding: 0 10px;
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  background: var(--fable-head-color);
-  height: var(--fable-head-height);
-  font-style: italic;
-}
-.nutrient-calculator-fable__foot {
-  padding: 0 10px;
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: var(--fable-foot-color);
-  height: var(--fable-foot-height);
-}
-
-.nutrient-calculator-fable__row {
+.fable__row {
+  flex: 1 0 100%;
   display: flex;
 }
 
-.nutrient-calculator-fable__cell {
-  flex-shrink: 0;
-  flex-grow: 1;
+.fable__cell {
+  border-left: 1px solid var(--border-color);
+  box-sizing: border-box;
+  height: var(--cell-height);
+  display: inline-block;
+  flex: 0 0 var(--cell-width);
   padding: 10px 15px;
-  width: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.nutrient-calculator-fable__cell:first-child {
-  width: 180px;
-  border-left: none;
-  font-weight: 600;
 }

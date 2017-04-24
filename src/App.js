@@ -13,7 +13,7 @@ import {
 } from 'lodash'
 import { pull, push } from './geestore'
 
-import Fable from './Fable'
+import Layout from './Layout'
 import './App.css'
 
 /* globals fetch */
@@ -21,22 +21,37 @@ import './App.css'
 const infoSymbol = Symbol('info')
 
 class App extends Component {
+  recommended = {
+    'кКал (Кк)': 1400,
+    'Белки (г)': 79,
+    'Жиры (г)': 63,
+    'Угл (г)': 132,
+    'Вит А (мкг)': 900,
+    'Вит С (мг)': 90,
+    'Кальций (мг)': 1000,
+    'Омега 3 (мг)': 3,
+    'Цинк (мг)': 10
+  }
+  getRecommendedValues (recommended: {}, head: []) {
+    const recommendedValues = cloneDeep(head[0])
+    return recommendedValues.map(it => {
+      const value = it.value
+      if (recommended.hasOwnProperty(value)) {
+        it.value = recommended[value]
+      } else {
+        it.value = 0
+      }
+      return it
+    })
+  }
+
   state = {
     fetchedAt: null,
     values: null,
     lookup: null,
-    recommended: {
-      'кКал (Кк)': 1400,
-      'Белки (г)': 79,
-      'Жиры (г)': 63,
-      'Угл (г)': 132,
-      'Вит А (мкг)': 900,
-      'Вит С (мг)': 90,
-      'Кальций (мг)': 1000,
-      'Омега 3 (мг)': 3,
-      'Цинк (мг)': 10
-    }
+    recommended: null
   }
+
   componentDidMount () {
     const sheetUri = [
       'https://sheets.googleapis.com/v4/spreadsheets/',
@@ -50,13 +65,16 @@ class App extends Component {
       .then(data => {
         const values = this.filterValidValues(data.values)
         const displayValues = this.resetValues(values)
+        const headValues = take(displayValues)
         const lookup = this.groupByProductNameAndNormalize(values)
-        return { values: displayValues, lookup }
+        const recommended = this.getRecommendedValues(this.recommended, headValues)
+        return { values: displayValues, lookup, recommended }
       })
-      .then(({values, lookup}) => this.setState({
+      .then(({values, lookup, recommended}) => this.setState({
         fetchedAt: +new Date(),
         lookup,
-        values
+        values,
+        recommended
       }))
       .then(() => {
         const { values: storedValues } = pull()
@@ -74,18 +92,18 @@ class App extends Component {
     return values.filter(val => val.length === validLength)
   }
   resetValues (values) {
-    return cloneDeep(values).map((row, ix) => {
-      const isHeader = ix === 0
-      if (!isHeader) {
-        return row.map((cell, iy) => {
-          const isLabel = iy === 0
-          if (isLabel) {
-            return cell
-          }
-          return cell === '0' ? -1 : 0
-        })
-      }
-      return row
+    return cloneDeep(values).map((row, x) => {
+      const isHeader = x === 0
+      return row.map((cell, y) => {
+        const isLabel = y === 0
+        const labelY = values[0][y]
+        const labelX = values[x][0]
+        let value = cell
+        if (!isLabel && !isHeader) {
+          value = cell === '0' ? -1 : 0
+        }
+        return {coord: {x, labelX, y, labelY}, value}
+      })
     })
   }
   restoreValues (storedValues) {
@@ -113,10 +131,17 @@ class App extends Component {
   }
   changeQuantity ({ coord, value }) {
     const { x: row, labelX: product } = coord
-    const normalizedInfo = this.state.lookup[product][infoSymbol]
+    const normalizedData = this.state.lookup[product][infoSymbol]
     const values = this.state.values
-    const copyRow = take(values[row])
-    const newRow = concat(copyRow, value, normalizedInfo.map(it => it > 0 ? it * value : -1))
+    const head = take(values[row])
+    const normalizedInfo = normalizedData.map(it => {
+      const newValue = it > 0 ? it * value : -1
+      return {
+        coord,
+        value: newValue
+      }
+    })
+    const newRow = concat(head, {coord, value}, normalizedInfo)
     values[row] = newRow
     this.setState({
       values
@@ -190,11 +215,12 @@ class App extends Component {
     console.log('changed total at:', coord, value)
   }
   render () {
+    const { values, recommended } = this.state
     return (
       this.state.fetchedAt
-        ? <Fable
-          values={this.state.values}
-          recommended={this.state.recommended}
+        ? <Layout
+          values={values}
+          recommended={recommended}
           onValueChange={this.onValueChange}
           onFootChange={this.onFootChange}
         />

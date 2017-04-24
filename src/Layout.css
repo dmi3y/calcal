@@ -1,0 +1,21 @@
+.layout {
+  --labels-width: 280px;
+  --fable-cell-height: 60px;
+
+  display: flex;
+}
+
+.layout__labels,
+.layout__values {
+}
+
+.layout__labels {
+  --fable-width: var(--labels-width);
+  --fable-cell-width: 100%;
+}
+.layout__values {
+  --fable-cell-width: 120px;
+  height: 100%;
+
+  overflow: scroll;
+}
