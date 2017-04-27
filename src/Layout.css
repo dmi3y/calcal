@@ -1,21 +1,30 @@
 .layout {
-  --labels-width: 280px;
   --fable-cell-height: 60px;
+  --fable-dashboard-position: 0;
 
   display: flex;
 }
 
 .layout__labels,
 .layout__values {
+  flex: 0 0 auto;
 }
 
-.layout__labels {
-  --fable-width: var(--labels-width);
-  --fable-cell-width: 100%;
-}
 .layout__values {
-  --fable-cell-width: 120px;
-  height: 100%;
+  --fable-cell-width: 100px;
+}
+.layout__labels {
+  --fable-width: 350px;
+  --fable-cell-width: 50%;
 
-  overflow: scroll;
+  left: 0;
+  z-index: 100;
+}
+.layout__labels .fable__cell:last-child {
+  border-right-style: double;
+  border-right-width: 3px;
+}
+.layout__labels .fable__body .fable__cell {
+  background-image: repeating-linear-gradient(-33deg, #eae5ff 5px, transparent 10px);
+  background-color: #fff;
 }

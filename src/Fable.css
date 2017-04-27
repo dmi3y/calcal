@@ -1,19 +1,17 @@
 .fable {
   --border-color: #cecece;
-  --head-color: #a2b2fd;
-  --head-height: 100px;
-  --foot-color: #2df373;
-  --foot-height: 100px;
+  --dash-color: #d9f9e5;
   --cell-width: var(--fable-cell-width, 80px);
   --cell-height: var(--fable-cell-height, inherit);
-  --dashboard-position: 0;
+  --dashboard-position: var(--fable-dashboard-position, 0);
+  --stripe-color: #f9f9f9;
 
   width: var(--fable-width, 100%);
   position: relative;
 }
 
 .fable__body .fable__row:nth-child(even) .fable__cell {
-  background: #f9f9f9;
+  background-color: var(--stripe-color);
 }
 .fable__dashboard {
   position: relative;
@@ -21,7 +19,11 @@
   left: 0; right: 0;
 }
 .fable__dashboard .fable__cell {
-  background: var(--foot-color);
+  background-image: repeating-linear-gradient(-26deg, var(--dash-color) 5px, transparent 10px);
+  background-color: #fff;
+}
+.fable__dashboard .fable__row:last-child .fable__cell {
+  border-bottom: 3px double var(--border-color);
 }
 
 .fable__body,
@@ -36,7 +38,7 @@
 }
 
 .fable__cell {
-  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
   box-sizing: border-box;
   height: var(--cell-height);
   display: inline-block;

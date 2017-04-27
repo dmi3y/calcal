@@ -1,14 +1,14 @@
 // @flow
 /* globals React$Element */
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { round, isFunction, isNumber } from 'lodash'
 import './Fable.css'
 
+import type { cellValue } from './customTypes'
+
 import EditableCell from './EditableCell'
 
-type cell = {coord: {}, value: string | number}
-
-class Fable extends Component {
+class Fable extends PureComponent {
   renderHead (row: Array<*>) {
     const rows = <div className='fable__row'>
       {
@@ -24,7 +24,7 @@ class Fable extends Component {
     return rows
   }
 
-  rowCell (cell: cell, key: number, onChange: ?Function): React$Element<*> {
+  rowCell (cell: cellValue, key: number, onChange: ?Function): React$Element<*> {
     const isLabel = !isNumber(cell.value)
     const isDisallowed = cell.value === -1
     const hasInputCallback = isFunction(onChange)
@@ -68,12 +68,12 @@ class Fable extends Component {
   }
 
   render (): React$Element<*> {
-    const { values, dashboard, onValueChange, className } = this.props
+    const { values, dashboard, dashboardPosition, bodyPosition = 0, onValueChange, className } = this.props
     const dash = this.renderDash(dashboard)
     const rows = this.renderRows(values, onValueChange)
 
-    return <div className={`fable ${className}`}>
-      <div className='fable__dashboard'>{dash}</div>
+    return <div style={{left: bodyPosition}} className={`fable ${className}`}>
+      <div style={{top: dashboardPosition}} className='fable__dashboard'>{dash}</div>
       <div className='fable__body'>{rows}</div>
     </div>
   }

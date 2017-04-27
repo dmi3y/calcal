@@ -1,15 +1,17 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import {
-  combineReducers
-} from 'redux-immutable'
+import { createStore, applyMiddleware } from 'redux'
+import createSagaMiddleware from 'redux-saga'
+import { combineReducers } from 'redux-immutablejs'
 import { Map } from 'immutable'
 
 import appReducers from './store/appReducers'
-import App from './App'
+import appSagas from './store/appSagas'
+import AppCont from './AppCont'
 import './index.css'
+
+const sagaMiddleware = createSagaMiddleware()
 
 const rootReducer = combineReducers({
   ...appReducers
@@ -18,12 +20,15 @@ const rootReducer = combineReducers({
 const initialState = Map()
 const store = createStore(
   rootReducer,
-  initialState
+  initialState,
+  applyMiddleware(sagaMiddleware)
 )
+
+sagaMiddleware.run(appSagas)
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <AppCont />
   </Provider>,
   document.getElementById('root')
 )

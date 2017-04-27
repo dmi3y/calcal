@@ -5,7 +5,7 @@ let store = {}
 const sessionStorage = window.sessionStorage
 // sessionStorage.setItem('store', JSON.stringify(store))
 
-export function push (data: string): void {
+export function push (data: Object): void {
   const copy = cloneDeep(data)
   store = lomerge(store, copy)
 }
@@ -19,7 +19,7 @@ export function merge (data: {}): {} {
   return lomerge(store, data)
 }
 
-export function pull (): {} {
+export function pull () {
   const storageData: Object = fetch()
   return merge(storageData)
 }

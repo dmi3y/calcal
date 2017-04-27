@@ -3,11 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "immutable": "^3.8.1",
     "lodash": "^4.17.4",
     "react": "^15.5.4",
-    "react-dom": "^15.5.4"
+    "react-dom": "^15.5.4",
+    "react-redux": "^5.0.4",
+    "redux": "^3.6.0",
+    "redux-immutablejs": "^0.0.8",
+    "redux-saga": "^0.14.7"
   },
   "devDependencies": {
+    "babel-eslint": "^7.2.3",
+    "eslint-plugin-flowtype": "^2.32.1",
     "flow-bin": "^0.44.2",
     "react-scripts": "0.9.5"
   },
@@ -17,5 +24,11 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "flow": "flow"
+  },
+  "standard": {
+    "plugins": [
+      "flowtype"
+    ],
+    "parser": "babel-eslint"
   }
 }

@@ -7,12 +7,6 @@ import './Layout.css'
 import Fable from './Fable'
 
 export default class Layout extends Component {
-  getLabelValies (values: Array<Array<*>>): Array<Array<*>> {
-    return values.map(value => take(value))
-  }
-  getBodyValies (values: Array<Array<*>>): Array<Array<*>> {
-    return values.map(value => drop(value))
-  }
   getTotalValues (values: Array<*>): Array<*> {
     const defaultValues = take(values[0], values[0].length).fill({value: 0})
 
@@ -25,14 +19,15 @@ export default class Layout extends Component {
       }
     }), defaultValues)
 
-    return totals
+    return drop(totals)
   }
+
   render (): React$Element<*> {
-    const { values, recommended, onValueChange } = this.props
-    const labelData = this.getLabelValies(values)
-    const bodyData = this.getBodyValies(values)
+    const { values, recommended, layout, onValueChange } = this.props
+    const labelData = values.map(value => take(value, 2))
+    const bodyData = values.map(value => drop(value, 2))
+    const totalValues = this.getTotalValues(values)
     const recommendedValues = drop(recommended)
-    const totalValues = this.getTotalValues(bodyData)
 
     const labelValues = drop(labelData)
     const labelHead = take(labelData)[0]
@@ -41,14 +36,23 @@ export default class Layout extends Component {
 
     return <div className='layout'>
       <Fable
+        dashboardPosition={layout.top}
+        bodyPosition={layout.left}
         className='layout__labels'
         values={labelValues}
-        dashboard={[labelHead, [{value: '='}], [{value: '+'}]]}
+        dashboard={
+          [
+            labelHead,
+            [{value: '='}, totalValues[0]],
+            [{value: '+'}, recommendedValues[0]]
+          ]}
+        onValueChange={onValueChange}
       />
       <Fable
+        dashboardPosition={layout.top}
         className='layout__values'
         values={bodyValues}
-        dashboard={[bodyHead, totalValues, recommendedValues]}
+        dashboard={[bodyHead, drop(totalValues), drop(recommendedValues)]}
         onValueChange={onValueChange}
       />
     </div>
