@@ -41,8 +41,8 @@
   border-right: 1px solid var(--border-color);
   box-sizing: border-box;
   height: var(--cell-height);
-  display: inline-block;
-  flex: 0 0 var(--cell-width);
+  min-width: var(--cell-width);
+  flex: 1 0;
   padding: 10px 15px;
   display: flex;
   align-items: center;

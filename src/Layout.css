@@ -2,12 +2,12 @@
   --fable-cell-height: 60px;
   --fable-dashboard-position: 0;
 
-  display: flex;
+  display: grid;
+  grid-template-columns: 350px auto;
 }
 
 .layout__labels,
 .layout__values {
-  flex: 0 0 auto;
 }
 
 .layout__values {
