@@ -1,5 +1,5 @@
 // @flow
-import { Map } from 'immutable'
+import { fromJS } from 'immutable'
 import { createReducer } from 'redux-immutablejs'
 import {
   take,
@@ -16,14 +16,13 @@ import {
 import { infoSymbol } from '../api/fetchDataSheet'
 import type { cellValue } from '../customTypes'
 
-const DEFAULT = Map({
+const DEFAULT = fromJS({
   isFetching: false,
   fetchedAt: null,
   isSuccess: null,
   data: [],
   lookup: {},
   values: [],
-  recommended: {},
   error: null
 })
 
@@ -53,20 +52,20 @@ function changeNutrient ({ coord, value }: cellValue, state: Object) {
 
 export default createReducer(DEFAULT, {
   [DATASHEET_FETCH_REQUEST]: (state, action) =>
-    state.merge({
+    state.merge(fromJS({
       isFetching: true,
       data: [],
       isSuccess: null
-    }),
+    })),
   [DATASHEET_FETCH_SUCCESS]: (state, action) =>
-    state.merge(action.payload.data),
+    state.merge(fromJS(action.payload.data)),
   [DATASHEET_FETCH_FAILURE]: (state, action) =>
-    state.merge({
+    state.merge(fromJS({
       isFetching: false,
       data: [],
       isSuccess: false,
       error: action.payload.error
-    }),
+    })),
   [DATASHEET_CHANGE_VALUE]: (state, {payload, meta}) => {
     const plainState = state.toJS()
     let values
@@ -76,7 +75,7 @@ export default createReducer(DEFAULT, {
       values = changeNutrient(payload, plainState)
     }
     return state.merge({
-      values
+      values: fromJS(values)
     })
   }
 })

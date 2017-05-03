@@ -35,7 +35,7 @@ export default class Stroller extends PureComponent {
       width,
       height
     })
-  }, 25)
+  }, 15)
 
   render () {
     return <div>

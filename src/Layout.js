@@ -2,7 +2,7 @@
 /* globals React$Element */
 
 import React, { Component } from 'react'
-import { take, drop, isNumber } from 'lodash'
+import { take, drop, isNumber, cloneDeep } from 'lodash'
 import './Layout.css'
 import Fable from './Fable'
 
@@ -22,12 +22,25 @@ export default class Layout extends Component {
     return drop(totals)
   }
 
+  getRecommendedValues (recommended: {}, headData: Array<string>) {
+    const headDataClone = cloneDeep(drop(headData))
+    return headDataClone.map(it => {
+      const value = it.value
+      if (recommended.hasOwnProperty(value)) {
+        it.value = recommended[value]
+      } else {
+        it.value = 0
+      }
+      return it
+    })
+  }
+
   render (): React$Element<*> {
     const { values, recommended, layout, onValueChange } = this.props
     const labelData = values.map(value => take(value, 2))
     const bodyData = values.map(value => drop(value, 2))
     const totalValues = this.getTotalValues(values)
-    const recommendedValues = drop(recommended)
+    const recommendedValues = this.getRecommendedValues(recommended, values[0])
 
     const labelValues = drop(labelData)
     const labelHead = take(labelData)[0]

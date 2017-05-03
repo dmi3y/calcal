@@ -1,8 +1,14 @@
 // @flow
+type product = string
+type nutrient = string
+
 export type cellCoord = {|
   x: number,
-  labelX: string,
+  labelX: product,
   y: number,
-  labelY: string
+  labelY: nutrient
 |}
+
 export type cellValue = {| coord: cellCoord, value: number |}
+
+export type sealedValue = { [product]: cellValue }

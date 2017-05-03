@@ -6,7 +6,7 @@ import {
   isPlainObject,
   isNumber
 } from 'lodash'
-import { push } from './geestore'
+
 import Stroller from './Stroller'
 
 import type { cellCoord, cellValue } from './customTypes'
@@ -18,10 +18,15 @@ type props = {
   fetchDataSheet: Function,
   changeValue: Function,
   scrollLayout: Function,
+  setRecommended: Function,
+  setLastChanged: Function,
+  retriveLastChanged: Function,
+  commitLastChanged: Function,
   lookup: Object,
   recommended: Object,
   values: Array<*>,
-  layout: Object
+  layout: Object,
+  fetchedAt: string
 }
 
 export default class App extends PureComponent<*, props, *> {
@@ -29,11 +34,6 @@ export default class App extends PureComponent<*, props, *> {
     this.props.fetchDataSheet()
   }
 
-  renderNoData () {
-    return <div className='app__no-data'>
-      Calculate it.
-    </div>
-  }
   validateValue ({coord, value}: cellValue) {
     let isValid = false
     const hasValue = isFinite(value) || isString(value)
@@ -49,7 +49,8 @@ export default class App extends PureComponent<*, props, *> {
     }
     return isValid
   }
-  changeValue (valuePack: cellValue, isForPush: boolean = true) {
+
+  changeValue (valuePack: cellValue) {
     const isValidValue = this.validateValue(valuePack)
 
     if (isValidValue) {
@@ -57,22 +58,15 @@ export default class App extends PureComponent<*, props, *> {
       const isQuantity = coord.y === 1
 
       this.props.changeValue(valuePack, isQuantity)
+      this.props.setLastChanged(valuePack)
+      this.props.commitLastChanged()
 
-      if (isForPush) {
-        push({
-          values: {
-            [`${coord.labelX}`]: {
-              coord,
-              value
-            }
-          }
-        })
-      }
       console.log('changed value at:', coord, value)
     } else {
       console.warn('got invalid value', valuePack)
     }
   }
+
   onValueChange = (coord: cellCoord, e: Object) => {
     const {labelX: product, labelY: nutrient, y} = coord
     const isNotQuantity = y !== 1
@@ -88,12 +82,18 @@ export default class App extends PureComponent<*, props, *> {
     }
   }
 
+  renderNoData () {
+    return <div className='app__no-data'>
+      Calculate it.
+    </div>
+  }
+
   render () {
-    const { values, recommended, scrollLayout, layout } = this.props
+    const { values, fetchedAt, recommended, scrollLayout, layout } = this.props
     return (
       <Stroller onScroll={scrollLayout}>
         {
-          this.props.fetchedAt
+          fetchedAt
           ? <Layout
             layout={layout}
             values={values}

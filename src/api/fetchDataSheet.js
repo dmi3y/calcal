@@ -4,46 +4,19 @@
 import {
   zipObject,
   drop,
-  cloneDeep,
-  each,
-  take
+  cloneDeep
 } from 'lodash'
 
-// import { pull } from '../geestore'
+const ENV: Object = process.env
 
 export const infoSymbol = 'infofreakinsymbol'
 
 const sheetUri = [
   'https://sheets.googleapis.com/v4/spreadsheets/',
-  `${process.env.REACT_APP_SHEETID}/values/`,
-  process.env.REACT_APP_SHEETPATH,
-  `?key=${process.env.REACT_APP_SECRET_KEY}`
+  `${ENV.REACT_APP_SHEETID}/values/`,
+  ENV.REACT_APP_SHEETPATH,
+  `?key=${ENV.REACT_APP_SECRET_KEY}`
 ].join('')
-
-const recommendedMap = {
-  'кКал (Кк)': 1400,
-  'Белки (г)': 79,
-  'Жиры (г)': 63,
-  'Угл (г)': 132,
-  'Вит А (мкг)': 900,
-  'Вит С (мг)': 90,
-  'Кальций (мг)': 1000,
-  'Омега 3 (мг)': 3,
-  'Цинк (мг)': 10
-}
-
-function getRecommendedValues (recommended: {}, head: Array<*>) {
-  const recommendedValues = cloneDeep(head[0])
-  return recommendedValues.map(it => {
-    const value = it.value
-    if (recommended.hasOwnProperty(value)) {
-      it.value = recommended[value]
-    } else {
-      it.value = 0
-    }
-    return it
-  })
-}
 
 function groupByProductNameAndNormalize (values) {
   const head = drop(values[0], 2)
@@ -58,12 +31,6 @@ function groupByProductNameAndNormalize (values) {
   }
   return body
 }
-
-// function restoreValues (storedValues) {
-//   each(storedValues, (data) => {
-//     changeValue(data, false)
-//   })
-// }
 
 function resetValues (values) {
   return cloneDeep(values).map((row, x) => {
@@ -93,17 +60,9 @@ function fetchDataSheet () {
     .then(data => {
       const values = filterValidValues(data.values)
       const displayValues = resetValues(values)
-      const headValues = take(displayValues)
       const lookup = groupByProductNameAndNormalize(values)
-      const recommended = getRecommendedValues(recommendedMap, headValues)
-      return { values: displayValues, lookup, recommended, fetchedAt: +new Date() }
+      return { values: displayValues, lookup, fetchedAt: +new Date() }
     })
-    // .then(({values, lookup, recommended}) => {
-    //   const { values: storedValues } = pull()
-    //   if (storedValues) {
-    //     restoreValues(storedValues)
-    //   }
-    // })
 }
 
 export default fetchDataSheet

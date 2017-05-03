@@ -1,12 +1,12 @@
 // @flow
-import { Map } from 'immutable'
+import { fromJS } from 'immutable'
 import { createReducer } from 'redux-immutablejs'
 
 import {
   WINDOW_SCROLL
 } from './layoutActions'
 
-const DEFAULT = Map({
+const DEFAULT = fromJS({
   left: 0,
   top: 0,
   width: 0,
