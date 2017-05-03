@@ -1,7 +1,4 @@
 .layout {
-  --fable-cell-height: 60px;
-  --fable-dashboard-position: 0;
-
   display: grid;
   grid-template-columns: 350px auto;
 }
@@ -11,14 +8,15 @@
 }
 
 .layout__values {
-  --fable-cell-width: 100px;
 }
 .layout__labels {
-  --fable-width: 350px;
-  --fable-cell-width: 50%;
-
-  left: 0;
   z-index: 100;
+}
+.layout__labels .fable__row {
+  grid-template-columns: 100px 30px;
+}
+.layout__values .fable__row {
+  grid-template-columns: repeat(10, 1fr);
 }
 .layout__labels .fable__cell:last-child {
   border-right-style: double;
