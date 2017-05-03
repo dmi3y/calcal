@@ -21,6 +21,7 @@
   "scripts": {
     "start": "env $(cat DEV.env) react-scripts start",
     "build": "env $(cat PROD.env) react-scripts build",
+    "deploy": "yarn build && surge ./build -d calcal.surge.sh",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "flow": "flow"
