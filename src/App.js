@@ -7,8 +7,6 @@ import {
   isNumber
 } from 'lodash'
 
-import Stroller from './Stroller'
-
 import type { cellCoord, cellValue } from './customTypes'
 
 import Layout from './Layout'
@@ -17,7 +15,6 @@ import './App.css'
 type props = {
   fetchDataSheet: Function,
   changeValue: Function,
-  scrollLayout: Function,
   setRecommended: Function,
   setLastChanged: Function,
   retriveLastChanged: Function,
@@ -25,7 +22,6 @@ type props = {
   lookup: Object,
   recommended: Object,
   values: Array<*>,
-  layout: Object,
   fetchedAt: string
 }
 
@@ -89,20 +85,15 @@ export default class App extends PureComponent<*, props, *> {
   }
 
   render () {
-    const { values, fetchedAt, recommended, scrollLayout, layout } = this.props
+    const { values, fetchedAt, recommended } = this.props
     return (
-      <Stroller onScroll={scrollLayout}>
-        {
-          fetchedAt
-          ? <Layout
-            layout={layout}
-            values={values}
-            recommended={recommended}
-            onValueChange={this.onValueChange}
-          />
-          : this.renderNoData()
-        }
-      </Stroller>
+      fetchedAt
+      ? <Layout
+        values={values}
+        recommended={recommended}
+        onValueChange={this.onValueChange}
+      />
+      : this.renderNoData()
     )
   }
 }

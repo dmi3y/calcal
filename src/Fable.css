@@ -1,22 +1,21 @@
 .fable {
   --border-color: #cecece;
   --dash-color: #d9f9e5;
-  --cell-width: var(--fable-cell-width, 80px);
-  --cell-height: var(--fable-cell-height, inherit);
-  --dashboard-position: var(--fable-dashboard-position, 0);
   --stripe-color: #f9f9f9;
 
-  width: var(--fable-width, 100%);
-  position: relative;
+  --cell-height: 60px;
+
+  width: 100%;
 }
 
 .fable__body .fable__row:nth-child(even) .fable__cell {
   background-color: var(--stripe-color);
 }
+.fable__body {
+  margin-top: calc(3 * var(--cell-height));
+}
 .fable__dashboard {
-  position: relative;
-  top: var(--dashboard-position);
-  left: 0; right: 0;
+  position: fixed;
 }
 .fable__dashboard .fable__cell {
   background-image: repeating-linear-gradient(-26deg, var(--dash-color) 5px, transparent 10px);
@@ -28,20 +27,17 @@
 
 .fable__body,
 .fable__dashboard {
-  display: flex;
-  flex-direction: column;
 }
 
 .fable__row {
-  flex: 1 0 100%;
-  display: flex;
+  display: grid;
 }
 
 .fable__cell {
   border-right: 1px solid var(--border-color);
   box-sizing: border-box;
   height: var(--cell-height);
-  min-width: var(--cell-width);
+  min-width: 80px;
   flex: 1 0;
   padding: 10px 15px;
   display: flex;

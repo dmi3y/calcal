@@ -68,12 +68,12 @@ class Fable extends PureComponent {
   }
 
   render (): React$Element<*> {
-    const { values, dashboard, dashboardPosition, bodyPosition = 0, onValueChange, className } = this.props
+    const { values, dashboard, onValueChange, className } = this.props
     const dash = this.renderDash(dashboard)
     const rows = this.renderRows(values, onValueChange)
 
-    return <div style={{left: bodyPosition}} className={`fable ${className}`}>
-      <div style={{top: dashboardPosition}} className='fable__dashboard'>{dash}</div>
+    return <div className={`fable ${className}`}>
+      <div className='fable__dashboard'>{dash}</div>
       <div className='fable__body'>{rows}</div>
     </div>
   }

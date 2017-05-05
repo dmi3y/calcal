@@ -1,12 +1,12 @@
 // @flow
 /* globals React$Element */
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { take, drop, isNumber, cloneDeep } from 'lodash'
 import './Layout.css'
 import Fable from './Fable'
 
-export default class Layout extends Component {
+export default class Layout extends PureComponent {
   getTotalValues (values: Array<*>): Array<*> {
     const defaultValues = take(values[0], values[0].length).fill({value: 0})
 
@@ -36,7 +36,7 @@ export default class Layout extends Component {
   }
 
   render (): React$Element<*> {
-    const { values, recommended, layout, onValueChange } = this.props
+    const { values, recommended, onValueChange } = this.props
     const labelData = values.map(value => take(value, 2))
     const bodyData = values.map(value => drop(value, 2))
     const totalValues = this.getTotalValues(values)
@@ -49,8 +49,6 @@ export default class Layout extends Component {
 
     return <div className='layout'>
       <Fable
-        dashboardPosition={layout.top}
-        bodyPosition={layout.left}
         className='layout__labels'
         values={labelValues}
         dashboard={
@@ -62,7 +60,6 @@ export default class Layout extends Component {
         onValueChange={onValueChange}
       />
       <Fable
-        dashboardPosition={layout.top}
         className='layout__values'
         values={bodyValues}
         dashboard={[bodyHead, drop(totalValues), drop(recommendedValues)]}
