@@ -1,22 +1,33 @@
 .layout {
+  --viewport-fraction: calc(100vw / 14);
+
   display: grid;
-  grid-template-columns: 350px auto;
+  grid-template-columns: auto auto;
 }
 
 .layout__labels,
 .layout__values {
+  z-index: 100;
 }
 
 .layout__values {
 }
+.layout__values .fable__dashboard {
+  right: 0;
+  left: calc(4 * var(--viewport-fraction));
+}
+
 .layout__labels {
-  z-index: 100;
+}
+.layout__labels .fable__dashboard {
+  left: 0;
+  right: calc(100vw - (4 * var(--viewport-fraction)));
 }
 .layout__labels .fable__row {
-  grid-template-columns: 100px 30px;
+  grid-template-columns:  auto var(--viewport-fraction);
 }
 .layout__values .fable__row {
-  grid-template-columns: repeat(10, 1fr);
+  grid-template-columns: repeat(10, var(--viewport-fraction));
 }
 .layout__labels .fable__cell:last-child {
   border-right-style: double;
