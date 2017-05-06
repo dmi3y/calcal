@@ -23,6 +23,10 @@ const DEFAULT = fromJS({
   data: [],
   lookup: {},
   values: [],
+  filter: {
+    title: null
+  },
+  filteredValues: [],
   error: null
 })
 

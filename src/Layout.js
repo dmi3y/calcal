@@ -22,7 +22,7 @@ export default class Layout extends PureComponent {
     return drop(totals)
   }
 
-  getRecommendedValues (recommended: {}, headData: Array<string>) {
+  getRecommendedValues (recommended: {}, headData: Array<*>) {
     const headDataClone = cloneDeep(drop(headData))
     return headDataClone.map(it => {
       const value = it.value
@@ -51,18 +51,21 @@ export default class Layout extends PureComponent {
       <Fable
         className='layout__labels'
         values={labelValues}
-        dashboard={
-          [
-            labelHead,
-            [{value: '='}, totalValues[0]],
-            [{value: '+'}, recommendedValues[0]]
-          ]}
+        dashboard={[
+          labelHead,
+          [{value: '+'}, recommendedValues[0]],
+          [{value: '='}, totalValues[0]]
+        ]}
         onValueChange={onValueChange}
       />
       <Fable
         className='layout__values'
         values={bodyValues}
-        dashboard={[bodyHead, drop(totalValues), drop(recommendedValues)]}
+        dashboard={[
+          bodyHead,
+          drop(recommendedValues),
+          drop(totalValues)
+        ]}
         onValueChange={onValueChange}
       />
     </div>

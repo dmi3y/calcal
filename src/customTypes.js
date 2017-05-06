@@ -10,5 +10,6 @@ export type cellCoord = {|
 |}
 
 export type cellValue = {| coord: cellCoord, value: number |}
+export type cellLabel = {| coord: cellCoord, value: string |}
 
 export type sealedValue = { [product]: cellValue }

@@ -13,18 +13,18 @@
 .layout__values {
 }
 .layout__values .fable__dashboard {
-  right: 0;
-  left: calc(4 * var(--viewport-fraction));
+  /*right: 0;
+  left: calc(4 * var(--viewport-fraction));*/
 }
 
 .layout__labels {
 }
 .layout__labels .fable__dashboard {
   left: 0;
-  right: calc(100vw - (4 * var(--viewport-fraction)));
+  right: calc(10 * var(--viewport-fraction));
 }
 .layout__labels .fable__row {
-  grid-template-columns:  auto var(--viewport-fraction);
+  grid-template-columns:  calc(3 * var(--viewport-fraction)) var(--viewport-fraction);
 }
 .layout__values .fable__row {
   grid-template-columns: repeat(10, var(--viewport-fraction));
@@ -33,7 +33,6 @@
   border-right-style: double;
   border-right-width: 3px;
 }
-.layout__labels .fable__body .fable__cell {
+.layout__labels .fable__body .fable__row {
   background-image: repeating-linear-gradient(-33deg, #eae5ff 5px, transparent 10px);
-  background-color: #fff;
 }
