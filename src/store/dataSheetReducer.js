@@ -6,11 +6,15 @@ import {
   concat
 } from 'lodash'
 
+import fzs from 'fuzzy.js'
+
 import {
   DATASHEET_FETCH_REQUEST,
   DATASHEET_FETCH_SUCCESS,
   DATASHEET_FETCH_FAILURE,
-  DATASHEET_CHANGE_VALUE
+  DATASHEET_CHANGE_VALUE,
+  DATASHEET_SET_FILTER,
+  DATASHEET_APPLY_FILTER
 } from './dataSheetActions'
 
 import { infoSymbol } from '../api/fetchDataSheet'
@@ -23,10 +27,10 @@ const DEFAULT = fromJS({
   data: [],
   lookup: {},
   values: [],
-  filter: {
-    title: null
+  filters: {
+    label: ''
   },
-  filteredValues: [],
+  filteredValues: [0],
   error: null
 })
 
@@ -81,5 +85,28 @@ export default createReducer(DEFAULT, {
     return state.merge({
       values: fromJS(values)
     })
+  },
+  [DATASHEET_SET_FILTER]: (state, {payload: value, meta}) => {
+    return state.mergeIn(['filters'], {[meta.type]: value})
+  },
+  [DATASHEET_APPLY_FILTER]: (state) => {
+    const THRESHOLD = 9
+    const filters = state.get('filters')
+    const values = state.get('values')
+    const filteredValues = values.filter((value, ix) => {
+      let hasPass: boolean = true
+      const isFilterable = ix !== 0
+      const filterLabelValue = filters.get('label')
+      if (isFilterable && hasPass && filterLabelValue) {
+        const match = fzs(value.getIn([0, 'value']), filterLabelValue)
+        hasPass = match.score > THRESHOLD
+      }
+      return hasPass
+    })
+    return state.setIn(['filteredValues'], filteredValues.map(row => row.getIn([
+      0,
+      'coord',
+      'x'
+    ])))
   }
 })

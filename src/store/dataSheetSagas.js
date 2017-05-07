@@ -1,9 +1,11 @@
-import { put, call, takeEvery } from 'redux-saga/effects'
+import { put, call, takeEvery, throttle } from 'redux-saga/effects'
 
 import {
   DATASHEET_FETCH_REQUEST,
   DATASHEET_FETCH_SUCCESS,
-  DATASHEET_FETCH_FAILURE
+  DATASHEET_FETCH_FAILURE,
+  DATASHEET_SET_FILTER,
+  DATASHEET_APPLY_FILTER
 } from './dataSheetActions'
 
 import {
@@ -28,4 +30,12 @@ function * fetchRequest () {
 
 export function * watchDataSheetFetch () {
   yield takeEvery(DATASHEET_FETCH_REQUEST, fetchRequest)
+}
+
+function * handleFilterInput () {
+  yield put({type: DATASHEET_APPLY_FILTER})
+}
+
+export function * watchFilterInput () {
+  yield throttle(500, DATASHEET_SET_FILTER, handleFilterInput)
 }

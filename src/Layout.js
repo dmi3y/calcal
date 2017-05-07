@@ -35,6 +35,13 @@ export default class Layout extends PureComponent {
     })
   }
 
+  applyLabelFilter = (e:Object) => {
+    this.props.applyFilter({
+      type: 'label',
+      value: e.target.value
+    })
+  }
+
   render (): React$Element<*> {
     const { values, recommended, onValueChange } = this.props
     const labelData = values.map(value => take(value, 2))
@@ -54,7 +61,7 @@ export default class Layout extends PureComponent {
         dashboard={[
           labelHead,
           [{value: '+'}, recommendedValues[0]],
-          [{value: '='}, totalValues[0]]
+          [{value: <input onChange={this.applyLabelFilter} value={this.props.filters.label} />}, totalValues[0]]
         ]}
         onValueChange={onValueChange}
       />

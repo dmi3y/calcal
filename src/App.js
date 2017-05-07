@@ -4,7 +4,8 @@ import {
   isFinite,
   isString,
   isPlainObject,
-  isNumber
+  isNumber,
+  pullAt
 } from 'lodash'
 
 import type { cellCoord, cellValue } from './customTypes'
@@ -15,13 +16,16 @@ import './App.css'
 type props = {
   fetchDataSheet: Function,
   changeValue: Function,
+  applyFilter: Function,
   setRecommended: Function,
   setLastChanged: Function,
   retriveLastChanged: Function,
   commitLastChanged: Function,
   lookup: Object,
+  filters: Object,
   recommended: Object,
   values: Array<*>,
+  filteredValues: Array<number>,
   fetchedAt: string
 }
 
@@ -85,13 +89,17 @@ export default class App extends PureComponent<*, props, *> {
   }
 
   render () {
-    const { values, fetchedAt, recommended } = this.props
+    const { values, filteredValues, fetchedAt, recommended } = this.props
+    const displayValues = pullAt(values, filteredValues)
+
     return (
       fetchedAt
       ? <Layout
-        values={values}
+        values={displayValues.concat(values)}
         recommended={recommended}
         onValueChange={this.onValueChange}
+        applyFilter={this.props.applyFilter}
+        filters={this.props.filters}
       />
       : this.renderNoData()
     )

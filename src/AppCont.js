@@ -2,7 +2,8 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import {
   fetchDataSheet,
-  changeValue
+  changeValue,
+  applyFilter
 } from './store/dataSheetActions'
 import {
   setLastChanged,
@@ -12,13 +13,15 @@ import {
 import App from './App'
 
 const mapStateToProps = (state) => {
-  const { lookup, values, fetchedAt } = state.get('dataSheet').toJS()
+  const { lookup, values, filteredValues, fetchedAt, filters } = state.get('dataSheet').toJS()
   const { recommended } = state.get('user').toJS()
   return {
     lookup,
     values,
+    filteredValues,
     fetchedAt,
-    recommended
+    recommended,
+    filters
   }
 }
 
@@ -26,7 +29,8 @@ const mapDispatchToProps = (dispatch) => bindActionCreators({
   fetchDataSheet,
   setLastChanged,
   commitLastChanged,
-  changeValue
+  changeValue,
+  applyFilter
 }, dispatch)
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)

@@ -13,8 +13,8 @@
 .layout__values {
 }
 .layout__values .fable__dashboard {
-  /*right: 0;
-  left: calc(4 * var(--viewport-fraction));*/
+  right: 0;
+  left: calc(4 * var(--viewport-fraction));
 }
 
 .layout__labels {
