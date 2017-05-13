@@ -13,11 +13,16 @@ import {
 import App from './App'
 
 const mapStateToProps = (state) => {
-  const { lookup, values, filteredValues, fetchedAt, filters } = state.get('dataSheet').toJS()
+  const { lookup, filteredValues, fetchedAt, filters } = state.get('dataSheet').toJS()
+  const values = state.getIn(['dataSheet', 'values'])
+  const head = values.size >= 1 ? values.first().toJS() : []
+  const body = values.size > 1 ? values.rest().toJS() : []
   const { recommended } = state.get('user').toJS()
+
   return {
     lookup,
-    values,
+    head,
+    body,
     filteredValues,
     fetchedAt,
     recommended,
