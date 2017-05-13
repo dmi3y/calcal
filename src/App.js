@@ -1,14 +1,8 @@
 // @flow
 import React, { PureComponent } from 'react'
-import {
-  isFinite,
-  isString,
-  isPlainObject,
-  isNumber,
-  pullAt
-} from 'lodash'
 
 import type { cellCoord, cellValue } from './customTypes'
+import validateValue from './validators/validateValue'
 
 import Layout from './Layout'
 import './App.css'
@@ -24,7 +18,8 @@ type props = {
   lookup: Object,
   filters: Object,
   recommended: Object,
-  values: Array<*>,
+  head: Array<*>,
+  body: Array<*>,
   filteredValues: Array<number>,
   fetchedAt: string
 }
@@ -34,24 +29,8 @@ export default class App extends PureComponent<*, props, *> {
     this.props.fetchDataSheet()
   }
 
-  validateValue ({coord, value}: cellValue) {
-    let isValid = false
-    const hasValue = isFinite(value) || isString(value)
-    const hasCoord = isPlainObject(coord)
-    if (hasValue && hasCoord) {
-      const hasXCoord = isNumber(coord.x)
-      const hasXLabel = isString(coord.labelX)
-      const hasX = hasXLabel && hasXCoord
-      const hasYCoord = isNumber(coord.y)
-      const hasYLabel = isString(coord.labelY)
-      const hasY = hasYLabel && hasYCoord
-      isValid = hasX && hasY
-    }
-    return isValid
-  }
-
   changeValue (valuePack: cellValue) {
-    const isValidValue = this.validateValue(valuePack)
+    const isValidValue = validateValue(valuePack)
 
     if (isValidValue) {
       const { coord, value } = valuePack
@@ -89,13 +68,13 @@ export default class App extends PureComponent<*, props, *> {
   }
 
   render () {
-    const { values, filteredValues, fetchedAt, recommended } = this.props
-    const displayValues = pullAt(values, filteredValues)
-
+    const { head, body, fetchedAt, recommended } = this.props
+    // const displayValues = pullAt(body, filteredValues)
     return (
       fetchedAt
       ? <Layout
-        values={displayValues.concat(values)}
+        head={head}
+        body={body}
         recommended={recommended}
         onValueChange={this.onValueChange}
         applyFilter={this.props.applyFilter}
