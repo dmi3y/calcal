@@ -8,6 +8,8 @@ import {
 
 import fzs from 'fuzzy.js'
 
+import validateValue from '../validators/validateValue'
+
 import {
   DATASHEET_FETCH_REQUEST,
   DATASHEET_FETCH_SUCCESS,
@@ -75,22 +77,35 @@ export default createReducer(DEFAULT, {
       error: action.payload.error
     })),
   [DATASHEET_CHANGE_VALUE]: (state, {payload, meta}) => {
-    const plainState = state.toJS()
-    let values
-    if (meta.isQuantity) {
-      values = changeQuantity(payload, plainState)
+    const isValid = validateValue(payload)
+    if (isValid) {
+      const lookupInfo = state.getIn(['lookup', payload.coord.labelX])
+      if (lookupInfo) {
+        const plainState = state.toJS()
+        let values
+        if (meta.isQuantity) {
+          values = changeQuantity(payload, plainState)
+        } else {
+          values = changeNutrient(payload, plainState)
+        }
+        return state.merge({
+          values: fromJS(values)
+        })
+      } else {
+        console.error('No lookup info for:', payload)
+        return state
+      }
     } else {
-      values = changeNutrient(payload, plainState)
+      console.error('Invalid value:', payload)
+      return state
     }
-    return state.merge({
-      values: fromJS(values)
-    })
   },
   [DATASHEET_SET_FILTER]: (state, {payload: value, meta}) => {
     return state.mergeIn(['filters'], {[meta.type]: value})
   },
   [DATASHEET_APPLY_FILTER]: (state) => {
-    const THRESHOLD = 9
+    const THRESHOLD_LONG = 9
+    const THRESHOLD_SHORT = 4
     const filters = state.get('filters')
     const values = state.get('values')
     const filteredValues = values.filter((value, ix) => {
@@ -99,6 +114,7 @@ export default createReducer(DEFAULT, {
       const filterLabelValue = filters.get('label')
       if (isFilterable && hasPass && filterLabelValue) {
         const match = fzs(value.getIn([0, 'value']), filterLabelValue)
+        const THRESHOLD = filterLabelValue.length > 3 ? THRESHOLD_LONG : THRESHOLD_SHORT
         hasPass = match.score > THRESHOLD
       }
       return hasPass
