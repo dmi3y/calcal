@@ -19,7 +19,6 @@ import {
   DATASHEET_APPLY_FILTER
 } from './dataSheetActions'
 
-import { infoSymbol } from '../api/fetchDataSheet'
 import type { cellValue } from '../customTypes'
 
 const DEFAULT = fromJS({
@@ -37,8 +36,8 @@ const DEFAULT = fromJS({
 })
 
 function changeQuantity ({ coord, value }: cellValue, state: Object) {
-  const { x: row, labelX: product } = coord
-  const normalizedData = state.lookup[product][infoSymbol]
+  const { labelX: product } = coord
+  const {norm: normalizedData, coord: {x: row}} = state.lookup[product]
   const values = state.values
   const head = take(values[row])
   const normalizedInfo = normalizedData.map(it => {

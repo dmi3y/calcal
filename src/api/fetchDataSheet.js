@@ -2,14 +2,11 @@
 /* globals fetch */
 
 import {
-  zipObject,
   drop,
   cloneDeep
 } from 'lodash'
 
 const ENV: Object = process.env
-
-export const infoSymbol = 'infofreakinsymbol'
 
 const sheetUri = [
   'https://sheets.googleapis.com/v4/spreadsheets/',
@@ -19,17 +16,20 @@ const sheetUri = [
 ].join('')
 
 function groupByProductNameAndNormalize (values) {
-  const head = drop(values[0], 2)
-  const body = {}
-  for (let i = 1; i < values.length; i++) {
-    const row = values[i]
+  const lookup = {}
+  for (let x = 1; x < values.length; x++) {
+    const row = values[x]
     const name = row[0]
     const quantity = row[1]
-    const info = drop(row, 2).map(it => it / quantity)
-    body[name] = zipObject(head, info)
-    body[name][infoSymbol] = info
+    const norm = drop(row, 2).map(it => it / quantity)
+    lookup[name] = {
+      norm,
+      coord: {
+        x
+      }
+    }
   }
-  return body
+  return lookup
 }
 
 function resetValues (values) {
