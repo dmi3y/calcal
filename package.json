@@ -1,6 +1,6 @@
 {
   "name": "calcalit",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "private": true,
   "dependencies": {
     "fuzzy.js": "^0.1.0",
