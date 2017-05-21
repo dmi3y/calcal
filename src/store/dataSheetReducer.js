@@ -29,9 +29,10 @@ const DEFAULT = fromJS({
   lookup: {},
   values: [],
   filters: {
-    label: ''
+    label: '',
+    minAmount: -1
   },
-  filteredValues: [0],
+  filteredValues: [],
   error: null
 })
 
@@ -107,14 +108,21 @@ export default createReducer(DEFAULT, {
     const THRESHOLD_SHORT = 4
     const filters = state.get('filters')
     const values = state.get('values')
-    const filteredValues = values.filter((value, ix) => {
+    const filteredValues = values.rest().filter((value, ix) => {
       let hasPass: boolean = true
-      const isFilterable = ix !== 0
+      const isFilterable = true
+      // Label Filter
       const filterLabelValue = filters.get('label')
       if (isFilterable && hasPass && filterLabelValue) {
         const match = fzs(value.getIn([0, 'value']), filterLabelValue)
         const THRESHOLD = filterLabelValue.length > 3 ? THRESHOLD_LONG : THRESHOLD_SHORT
         hasPass = match.score > THRESHOLD
+      }
+      // Min Amount Filter
+      const filterMinAmount = filters.get('minAmount')
+      if (isFilterable && hasPass && filterMinAmount > -1) {
+        const amount = value.getIn([1, 'value'])
+        hasPass = amount > filterMinAmount
       }
       return hasPass
     })

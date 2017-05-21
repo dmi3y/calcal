@@ -2,6 +2,7 @@
 /* globals React$Element */
 import React, { PureComponent } from 'react'
 import { round, isFunction, isNumber } from 'lodash'
+import Infinite from 'react-infinite'
 import './Fable.css'
 
 import type { cellValue } from './customTypes'
@@ -74,7 +75,11 @@ class Fable extends PureComponent {
 
     return <div className={`fable ${className}`}>
       <div className='fable__dashboard'>{dash}</div>
-      <div className='fable__body'>{rows}</div>
+      <Infinite
+        elementHeight={60}
+        className='fable__body'
+        useWindowAsScrollContainer
+      >{rows}</Infinite>
     </div>
   }
 }
