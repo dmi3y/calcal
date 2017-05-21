@@ -68,17 +68,20 @@ export default class App extends PureComponent<*, props, *> {
   }
 
   render () {
-    const { head, body, fetchedAt, recommended } = this.props
-    // const displayValues = pullAt(body, filteredValues)
+    const { head, body, fetchedAt, recommended, filteredValues, filters } = this.props
+    let displayValues = body
+    if (filters.minAmount > -1) {
+      displayValues = body.filter((row) => filteredValues.includes(row[0].coord.x))
+    }
     return (
       fetchedAt
       ? <Layout
         head={head}
-        body={body}
+        body={displayValues}
         recommended={recommended}
         onValueChange={this.onValueChange}
         applyFilter={this.props.applyFilter}
-        filters={this.props.filters}
+        filters={filters}
       />
       : this.renderNoData()
     )
