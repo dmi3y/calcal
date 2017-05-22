@@ -70,7 +70,7 @@ export default class App extends PureComponent<*, props, *> {
   render () {
     const { head, body, fetchedAt, recommended, filteredValues, filters } = this.props
     let displayValues = body
-    if (filters.minAmount > -1) {
+    if (filters.minAmount > -1 || filters.label.length > 0) {
       displayValues = body.filter((row) => filteredValues.includes(row[0].coord.x))
     }
     return (
