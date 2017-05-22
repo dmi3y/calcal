@@ -1,6 +1,6 @@
 // @flow
 /* globals React$Element */
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { round, isFunction, isNumber } from 'lodash'
 import Infinite from 'react-infinite'
 import './Fable.css'
@@ -9,7 +9,7 @@ import type { cellValue } from './customTypes'
 
 import EditableCell from './EditableCell'
 
-class Fable extends PureComponent {
+class Fable extends Component {
   renderHead (row: Array<*>) {
     const rows = <div className='fable__row'>
       {

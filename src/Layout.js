@@ -50,6 +50,11 @@ export default class Layout extends Component {
   renderFilters = () => {
     return <div>
       <input
+        type='text'
+        value={this.props.filters.label}
+        onChange={this.applyLabelFilter}
+      />
+      <input
         type='checkbox'
         checked={this.props.filters.minAmount === 0}
         onChange={this.applyMinAmountFilter}
