@@ -1,11 +1,16 @@
 // @flow
 import React, { PureComponent } from 'react'
+import PropTypes from 'prop-types'
+import keymap from './keymap'
+import { ShortcutManager } from 'react-shortcuts'
 
 import type { cellCoord, cellValue } from './customTypes'
 import validateValue from './validators/validateValue'
 
 import Layout from './Layout'
 import './App.css'
+
+const shortcutManager = new ShortcutManager(keymap)
 
 type props = {
   fetchDataSheet: Function,
@@ -25,6 +30,14 @@ type props = {
 }
 
 export default class App extends PureComponent<*, props, *> {
+  getChildContext () {
+    return { shortcuts: shortcutManager }
+  }
+
+  static childContextTypes = {
+    shortcuts: PropTypes.object.isRequired
+  }
+
   componentDidMount () {
     this.props.fetchDataSheet()
   }
@@ -69,19 +82,16 @@ export default class App extends PureComponent<*, props, *> {
 
   render () {
     const { head, body, fetchedAt, recommended, filteredValues, filters } = this.props
-    let displayValues = body
-    if (filters.minAmount > -1 || filters.label.length > 0) {
-      displayValues = body.filter((row) => filteredValues.includes(row[0].coord.x))
-    }
     return (
       fetchedAt
       ? <Layout
         head={head}
-        body={displayValues}
+        body={body}
         recommended={recommended}
         onValueChange={this.onValueChange}
         applyFilter={this.props.applyFilter}
         filters={filters}
+        filteredValues={filteredValues}
       />
       : this.renderNoData()
     )
