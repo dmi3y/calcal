@@ -105,7 +105,7 @@ export default createReducer(DEFAULT, {
   },
   [DATASHEET_APPLY_FILTER]: (state) => {
     const THRESHOLD_LONG = 9
-    const THRESHOLD_SHORT = 4
+    const THRESHOLD_SHORT = 3
     const filters = state.get('filters')
     const values = state.get('values')
     const filteredValues = values.rest().filter((value, ix) => {
