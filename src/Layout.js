@@ -19,7 +19,9 @@ export default class Layout extends Component {
     /* eslint-disable default-case */
     switch (action) {
       case SEARCH_FOCUS:
-        this.filterElements.labelSearch.focus()
+        const inputSearch = this.filterElements.labelSearch
+        inputSearch.focus()
+        inputSearch.select()
         e.preventDefault()
         break
       case SEARCH_BLUR:
@@ -109,7 +111,7 @@ export default class Layout extends Component {
     const labelHead = take(head, 2)
     // const bodyValues = drop(bodyData)
     const bodyHead = drop(head, 2)
-    return <Shortcuts name='Layout' handler={this._handleShortcuts}>
+    return <Shortcuts name='Layout' handler={this._handleShortcuts} alwaysFireHandler>
       <div className='layout' tabIndex='0' ref={el => (this.filterElements.layout = el)}>
         <Fable
           className='layout__labels'
