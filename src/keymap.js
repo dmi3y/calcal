@@ -4,8 +4,8 @@ export const TOGGLE_ENTERED = 'TOGGLE_ENTERED'
 
 export default {
   Layout: {
-    [SEARCH_FOCUS]: 'shift+f',
+    [SEARCH_FOCUS]: 'ctrl+f',
     [SEARCH_BLUR]: 'esc',
-    [TOGGLE_ENTERED]: 'shift+d'
+    [TOGGLE_ENTERED]: 'ctrl+d'
   }
 }
