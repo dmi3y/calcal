@@ -5,7 +5,6 @@ import keymap from './keymap'
 import { ShortcutManager } from 'react-shortcuts'
 
 import type { cellCoord, cellValue } from './customTypes'
-import validateValue from './validators/validateValue'
 
 import Layout from './Layout'
 import './App.css'
@@ -43,32 +42,18 @@ export default class App extends PureComponent<*, props, *> {
   }
 
   changeValue (valuePack: cellValue) {
-    const isValidValue = validateValue(valuePack)
+    const { coord: {y} } = valuePack
+    const isQuantity = y === 1
 
-    if (isValidValue) {
-      const { coord, value } = valuePack
-      const isQuantity = coord.y === 1
-
-      this.props.changeValue(valuePack, isQuantity)
-      this.props.setLastChanged(valuePack)
-      this.props.commitLastChanged()
-
-      console.log('changed value at:', coord, value)
-    } else {
-      console.warn('got invalid value', valuePack)
-    }
+    this.props.changeValue(valuePack, isQuantity)
+    this.props.setLastChanged(valuePack)
+    this.props.commitLastChanged()
   }
 
   onValueChange = (coord: cellCoord, e: Object) => {
-    const {labelX: product, labelY: nutrient, y} = coord
-    const isNotQuantity = y !== 1
     const value = Number(e.target.value)
-    let shouldChangeValue = true
+    let shouldChangeValue = value >= 0
 
-    if (isNotQuantity) {
-      const lookupValue = this.props.lookup[product][nutrient]
-      shouldChangeValue = Boolean(lookupValue) && value >= 0
-    }
     if (shouldChangeValue) {
       this.changeValue({coord, value})
     }

@@ -76,7 +76,7 @@ class Fable extends Component {
     return <div className={`fable ${className}`}>
       <div className='fable__dashboard'>{dash}</div>
       <Infinite
-        elementHeight={60}
+        elementHeight={70}
         className='fable__body'
         useWindowAsScrollContainer
       >{rows}</Infinite>

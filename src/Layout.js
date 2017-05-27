@@ -2,7 +2,7 @@
 /* globals React$Element */
 
 import React, { Component } from 'react'
-import { take, drop, isNumber, cloneDeep } from 'lodash'
+import { take, drop, isFinite, cloneDeep } from 'lodash'
 import './Layout.css'
 import Fable from './Fable'
 
@@ -43,13 +43,12 @@ export default class Layout extends Component {
   getTotalValues (values: Array<*>, defaultValues: Array<*>): Array<*> {
     const totals = values.reduce((acc, row) => acc.map((it, ix) => {
       const cell = row[ix]
-      const isAllowed = isNumber(cell.value) && cell.value !== -1
+      const isAllowed = isFinite(cell.value) && cell.value !== -1
       const nextValue = isAllowed ? it.value + Number(cell.value) : it.value
       return {
         value: nextValue
       }
     }), defaultValues)
-
     return drop(totals)
   }
 
