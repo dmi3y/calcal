@@ -1,12 +1,9 @@
 // @flow
 import { fromJS } from 'immutable'
 import { createReducer } from 'redux-immutablejs'
-import {
-  take,
-  concat
-} from 'lodash'
 
 import fzs from 'fuzzy.js'
+import { isNil } from 'lodash'
 
 import validateValue from '../validators/validateValue'
 
@@ -19,14 +16,15 @@ import {
   DATASHEET_APPLY_FILTER
 } from './dataSheetActions'
 
-import type { cellValue } from '../customTypes'
-
 const DEFAULT = fromJS({
   isFetching: false,
   fetchedAt: null,
   isSuccess: null,
   data: [],
-  lookup: {},
+  lookup: {
+    products: {},
+    nutrients: {}
+  },
   values: [],
   filters: {
     label: '',
@@ -35,30 +33,6 @@ const DEFAULT = fromJS({
   filteredValues: [],
   error: null
 })
-
-function changeQuantity ({ coord, value }: cellValue, state: Object) {
-  const { labelX: product } = coord
-  const {norm: normalizedData, coord: {x: row}} = state.lookup[product]
-  const values = state.values
-  const head = take(values[row])
-  const normalizedInfo = normalizedData.map(it => {
-    const newValue = it > 0 ? it * value : -1
-    return {
-      coord,
-      value: newValue
-    }
-  })
-  const newRow = concat(head, {coord, value}, normalizedInfo)
-  values[row] = newRow
-  return values
-}
-
-function changeNutrient ({ coord, value }: cellValue, state: Object) {
-  const {labelX: product, labelY: nutrient} = coord
-  const normalizedNutrientValue = state.lookup[product][nutrient]
-  const productValue = value / normalizedNutrientValue
-  return changeQuantity({coord, value: productValue}, state)
-}
 
 export default createReducer(DEFAULT, {
   [DATASHEET_FETCH_REQUEST]: (state, action) =>
@@ -78,19 +52,32 @@ export default createReducer(DEFAULT, {
     })),
   [DATASHEET_CHANGE_VALUE]: (state, {payload, meta}) => {
     const isValid = validateValue(payload)
+    console.log(payload, meta)
     if (isValid) {
-      const lookupInfo = state.getIn(['lookup', payload.coord.labelX])
-      if (lookupInfo) {
-        const plainState = state.toJS()
-        let values
-        if (meta.isQuantity) {
-          values = changeQuantity(payload, plainState)
-        } else {
-          values = changeNutrient(payload, plainState)
+      const productLookup = state.getIn(['lookup', 'products', payload.coord.labelX])
+      if (productLookup) {
+        const productNorm = productLookup.get('norm')
+        const { value } = payload
+        const productX = productLookup.get('x')
+        let productValue = value
+        if (!meta.isQuantity) {
+          const nutrientIndex = state.getIn(['lookup', 'nutrients', payload.coord.labelY])
+          if (!isNil(nutrientIndex)) {
+            const normalizedNutrientValue = productNorm.get(nutrientIndex)
+            productValue = value / normalizedNutrientValue
+          } else {
+            console.error('No nutrient index info for', payload)
+            return state
+          }
         }
-        return state.merge({
-          values: fromJS(values)
-        })
+        const newRowValues = productNorm.map(it => it > 0 ? it * productValue : -1).unshift(productValue)
+        return state.updateIn([
+          'values',
+          productX
+        ], row => row.map((it, ix) =>
+            ix > 0 ? it.set('value', newRowValues.get(ix - 1)) : it
+          )
+        )
       } else {
         console.error('No lookup info for:', payload)
         return state

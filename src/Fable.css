@@ -3,8 +3,6 @@
   --dash-color: #d9f9e5;
   --stripe-color: #f9f9f9;
 
-  --cell-height: 60px;
-
   width: 100%;
 }
 
@@ -12,7 +10,10 @@
   background-color: var(--stripe-color);
 }
 .fable__body {
-  margin-top: calc(3 * var(--cell-height));
+  margin-top: 105px;
+}
+.fable__body .fable__cell {
+  height: 70px;
 }
 .fable__dashboard {
   position: fixed;
@@ -20,6 +21,7 @@
 .fable__dashboard .fable__cell {
   background-image: repeating-linear-gradient(-26deg, var(--dash-color) 5px, transparent 10px);
   background-color: #fff;
+  height: 35px;
 }
 .fable__dashboard .fable__row:last-child .fable__cell {
   border-bottom: 3px double var(--border-color);
@@ -36,7 +38,6 @@
 .fable__cell {
   border-right: 1px solid var(--border-color);
   box-sizing: border-box;
-  height: var(--cell-height);
   min-width: 80px;
   flex: 1 0;
   padding: 10px 15px;

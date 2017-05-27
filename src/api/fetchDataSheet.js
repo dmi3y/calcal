@@ -3,7 +3,8 @@
 
 import {
   drop,
-  cloneDeep
+  cloneDeep,
+  fromPairs
 } from 'lodash'
 
 const ENV: Object = process.env
@@ -16,20 +17,20 @@ const sheetUri = [
 ].join('')
 
 function groupByProductNameAndNormalize (values) {
-  const lookup = {}
+  const products = {}
+  const labels = drop(values[0], 2)
+  const nutrients = fromPairs(labels.map((value, ix) => [value, ix]))
   for (let x = 1; x < values.length; x++) {
     const row = values[x]
     const name = row[0]
     const quantity = row[1]
     const norm = drop(row, 2).map(it => it / quantity)
-    lookup[name] = {
+    products[name] = {
       norm,
-      coord: {
-        x
-      }
+      x
     }
   }
-  return lookup
+  return { products, nutrients }
 }
 
 function resetValues (values) {
