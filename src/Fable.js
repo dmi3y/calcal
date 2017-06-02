@@ -35,7 +35,7 @@ class Fable extends Component {
       const roundValue = round(cell.value, 3)
       const showValue = roundValue > 0 ? roundValue : ''
       return <div className='fable__cell' key={key}>
-        <EditableCell value={showValue} onChange={onChange.bind(null, cell.coord)} />
+        <EditableCell showValue={showValue} onChange={onChange} data={cell.coord} />
       </div>
     }
     if (isDisallowed) {
