@@ -95,6 +95,12 @@ export default class Layout extends Component {
     </div>
   }
 
+  renderControls = () => {
+    return <div>
+      <button>-</button>
+    </div>
+  }
+
   render (): React$Element<*> {
     const { head, body, filters, filteredValues, recommended, onValueChange } = this.props
     let filteredData = body
@@ -118,7 +124,7 @@ export default class Layout extends Component {
           dashboard={[
             labelHead,
             [
-              {value: '+'},
+              {value: this.renderControls()},
               take(recommendedValues, 2)
             ],
             [
